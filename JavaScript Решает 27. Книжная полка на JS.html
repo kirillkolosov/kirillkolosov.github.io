@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+        crossorigin="anonymous">
+        <style>
+        	body {
+    background: #f4f7f6;
+}
+
+.book {
+    text-align: center;
+}
+
+.book-cover {
+    height: 250px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: 50%;
+}
+        </style>
+    <title>Hello, world!</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <h1 class="text-center col-lg-12">Library</h1>
+
+            <div class="col-lg-12 text-right">
+                <button class="book-add btn btn-primary" data-toggle="modal" data-target="#modal-add-book">Add book</button>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="row book-panel">
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modal-add-book" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add book to library</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group row">
+                            <label for="book-name" class="col-sm-2 col-form-label">Book:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="book-name" id="book-name" value="Колобок">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="book-author" class="col-sm-2 col-form-label">Author:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="book-author" id="book-author" value="Пример Примерыч">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="book-year" class="col-sm-2 col-form-label">Year:</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="book-year" id="book-year" value="2018">
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                                <label for="book-cover" class="col-sm-2 col-form-label">Cover:</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="book-cover" id="book-cover" value="https://i.livelib.ru/boocover/1000008975/o/ce3c/bez_avtora__Kolobok.jpeg">
+                                </div>
+                            </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="modal-add-book-ok">Add book</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+        crossorigin="anonymous"></script>
+    <script>
+
+    	//Массив для хранения книг
+    	var books = {};
+//добавлять книгу в библиотеку
+$(document).ready(function(){
+    $('#modal-add-book-ok').on('click', addBookToLibrary);//обработчик добавление книги при нажатии на который запускается функция 
+    var saveBooks = localStorage.getItem('library');
+    if (saveBooks) {
+        books = JSON.parse(saveBooks);
+        console.log(books);
+        for( var key in books) {
+            drawBook(key);
+        }
+    }
+});
+//выб
+function addBookToLibrary(){
+	//проходится по форме и все элементы заносит в массимв
+    var formData = $('form').serializeArray();
+    // console.log(formData);
+
+    ///создание и перебор массимва
+    var newArray = {};
+    for (key in formData){
+        newArray[formData[key]['name']] = formData[key]['value'];
+    }
+    // console.log(newArray);
+    var data = $(this).attr('data');
+    if (data == undefined){
+        var randomArticle = Math.round(Math.random()*100000);
+        books[randomArticle] = newArray;
+        //console.log(books);
+        drawBook(randomArticle);
+    }
+    else {
+        books[data] = newArray;
+        drawBook(data)    
+    }
+    console.log(books);
+    $('#modal-add-book').modal('hide');//закрытие книги
+    localStorage.setItem('library', JSON.stringify(books));
+   
+}
+
+function drawBook(article){
+    var book = $('.book[data='+article+']');
+    if (book.length == 0) {
+        var div = document.createElement('div');
+        div.className = "col-lg-3 book";
+        div.setAttribute('data', article);
+        //Добавдение книги
+
+        var cover = document.createElement('div');
+        cover.className = "book-cover";
+        cover.style.backgroundImage = `url(${books[article]['book-cover']})`;
+        //имя книги
+        var bookName = document.createElement('h4');
+        bookName.className = "book-title";
+        bookName.innerHTML = books[article]['book-name'];
+        //год книги
+        var bookYear = document.createElement('p');
+        bookYear.className = "book-year";
+        bookYear.innerHTML = books[article]['book-year'];
+        //имя книги
+        var buttonEdit = document.createElement('button');
+        buttonEdit.className = "btn btn-success edit";
+        buttonEdit.innerHTML = 'Редактировать';
+        buttonEdit.setAttribute('data', article);
+        buttonEdit.onclick = editBook;
+
+        var buttonDelete = document.createElement('button');
+        buttonDelete.className = "btn btn-warning edit";
+        buttonDelete.innerHTML = 'Delete';
+        buttonDelete.setAttribute('data', article);
+        buttonDelete.onclick = deleteBook;
+
+        div.appendChild(cover);
+        div.appendChild(bookName);
+        div.appendChild(bookYear);
+        div.appendChild(buttonEdit);
+        div.appendChild(buttonDelete);
+
+        $('.book-panel').append(div);
+    }
+    else {
+        var bookCover = book.find('.book-cover');
+        bookCover.css({'background-image': 'url('+books[article]['book-cover']+')'});
+        var bookYear = book.find('.book-year').eq(0);
+        bookYear.html( books[article]['book-year'] );
+        var bookName = book.find('.book-title').eq(0);
+        bookName.html( books[article]['book-name'] );
+        var bookAuthor = book.find('.book-author').eq(0);
+        bookAuthor.html( books[article]['book-author'] );
+        $('#modal-add-book-ok').removeAttr('data');
+    }
+}
+
+function editBook(){
+    var data  = $(this).attr('data');
+    console.log(data);
+    //show modal
+    $('#modal-add-book').modal('show');
+    $('form #book-name').val(books[data]['book-name']);
+    $('form #book-author').val(books[data]['book-author']);
+    $('form #book-cover').val(books[data]['book-cover']);
+    $('form #book-year').val(books[data]['book-year']);
+    $('#modal-add-book-ok').attr('data', data);
+}
+
+function deleteBook(){
+    $(this).parent('.book').remove();
+    var data = $(this).attr('data');
+    console.log(data);
+    delete books[data];
+    console.log(books);
+}
+    </script>
+    <script>
+        document.write('<script src="http://' + (location.host || '${1:localhost}').split(':')[0] + ':${2:35729}/livereload.js?snipver=1"></' + 'script>')
+    </script>
+</body>
+
+</html>
